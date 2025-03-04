@@ -89,12 +89,6 @@ export const useChatStore = defineStore('counter', {
       this.messages[from].push({ from, message });
     },
 
-    saveMessage(contactName: string) {
-      if (this.text.trim()) {
-        this.addMessage(contactName, this.text);
-        this.text = '';
-      }
-    },
 
 
     openChat(contactName: string) {

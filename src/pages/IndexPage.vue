@@ -33,14 +33,14 @@
       </template>
 
       <template v-slot:after>
-        <q-tab-panels v-model="tab" animated swipeable vertical transition-prev="jump-up" transition-next="jump-up">
+        <q-tab-panels v-model="tab" animated swipeable vertical transition-prev="jump-up" transition-next="jump-up" style="height: 100vh">
           <q-tab-panel v-for="contact in store.contacts" :key="contact.name" :name="contact.name" class="dialog">
             <div class="q-pa-md row justify-center">
               <div>
                 <q-chat-message
                   v-for="msg in store.messages[contact.name] || []"
                   :key="msg.message"
-                  :name="msg.from"
+                  :name="msg.from === 'me' ? 'Me' : contact.name"
                   :text="[msg.message]"
                   :sent="msg.from === 'me'"
                 />
@@ -48,7 +48,7 @@
             </div>
 
             <div class="message-input">
-              <q-input filled v-model="message" label="Type a message..."          outlined
+              <q-input filled v-model="message" label="Type a message..."  style="width: 100%"         outlined
                        @keyup.enter="sendMessage" />
               <q-btn icon="send" color="primary" round @click="sendMessage" />
             </div>
@@ -82,10 +82,16 @@ export default {
 
     const sendMessage = () => {
       if (message.value.trim() && tab.value) {
+        const msg = { from: 'me', to: tab.value, message: message.value };
+        if (store.socket && store.socket.readyState === WebSocket.OPEN) {
+          store.socket.send(JSON.stringify(msg));
+        }
         store.addMessage(tab.value, message.value, 'me');
         message.value = "";
       }
     };
+
+
 
     return {
       tab,
